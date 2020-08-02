@@ -1,0 +1,304 @@
+
+SQL*Plus: Release 11.2.0.1.0 Production on Thu Oct 24 19:12:26 2019
+
+Copyright (c) 1982, 2010, Oracle.  All rights reserved.
+
+Enter user-name: system
+Enter password:
+
+Connected to:
+Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+
+SQL> conn system/sahil@db1
+Connected.
+SQL> create table emp (enumber number primary key, ename varchar2(10), addr varchar2(15), email varchar2(20),salary float);
+create table emp (enumber number primary key, ename varchar2(10), addr varchar2(15), email varchar2(20),salary float)
+             *
+ERROR at line 1:
+ORA-00955: name is already used by an existing object
+
+
+SQL> create table emp1(enumber number primary key, ename varchar2(10), addr varchar2(15), email varchar2(20),salary float);
+
+Table created.
+
+SQL> conn system/sahil@db3
+Connected.
+SQL> create table emp1(enumber number primary key, ename varchar2(10), addr varchar2(15), email varchar2(20),salary float);
+
+Table created.
+
+SQL>  create database link db3todb1 connect to system identified by sahil using 'db1';
+ create database link db3todb1 connect to system identified by sahil using 'db1'
+                      *
+ERROR at line 1:
+ORA-02011: duplicate database link name
+
+
+SQL> create or replace trigger insert_data
+  2  after insert on emp1
+  3  for each row
+  4  begin
+  5  insert into emp@db3todb1 values(:new.enumber,:new.ename,:new.addr,:new.email,:new.salary);
+  6  end;
+  7  /
+create or replace trigger insert_data
+                          *
+ERROR at line 1:
+ORA-04095: trigger 'INSERT_DATA' already exists on another table, cannot
+replace it
+
+
+SQL> create or replace trigger insert_data1
+  2  after insert on emp1
+  3  for each row
+  4  begin
+  5  insert into emp@db3todb1 values(:new.enumber,:new.ename,:new.addr,:new.email,:new.salary);
+  6  end;
+  7  /
+
+Warning: Trigger created with compilation errors.
+
+SQL> show error
+Errors for TRIGGER INSERT_DATA1:
+
+LINE/COL ERROR
+-------- -----------------------------------------------------------------
+0/0      ORA-04052: error occurred when looking up remote object
+         SYSTEM.EMP@DB3TODB1
+         ORA-00604: error occurred at recursive SQL level 1
+         ORA-01017: invalid username/password; logon denied
+         ORA-02063: preceding line from DB3TODB1
+
+SQL> create or replace trigger insert_data1
+  2  after insert on emp1
+  3  for each row
+  4  begin
+  5  insert into emp1@db3todb1 values(:new.enumber,:new.ename,:new.addr,:new.email,:new.salary);
+  6  end;
+  7  /
+
+Warning: Trigger created with compilation errors.
+
+SQL> show error
+Errors for TRIGGER INSERT_DATA1:
+
+LINE/COL ERROR
+-------- -----------------------------------------------------------------
+0/0      ORA-04052: error occurred when looking up remote object
+         SYSTEM.EMP1@DB3TODB1
+         ORA-00604: error occurred at recursive SQL level 1
+         ORA-01017: invalid username/password; logon denied
+         ORA-02063: preceding line from DB3TODB1
+
+SQL> conn system/sahil@db1
+Connected.
+SQL>  create database link db1todb3 connect to system identified by sahil using 'db3';
+
+Database link created.
+
+SQL> create or replace trigger insert_data1
+  2  after insert on emp1
+  3  for each row
+  4  begin
+  5  insert into emp1@db1todb3 values(:new.enumber,:new.ename,:new.addr,:new.email,:new.salary);
+  6  end;
+  7  /
+
+Trigger created.
+
+SQL> create or replace trigger insert_data1
+  2  before delete on emp1
+  3  for each row
+  4  begin
+  5  delete from emp1@db1todb3 where enumber=:old.enumber;
+  6  end;
+  7  /
+
+Trigger created.
+
+SQL> create or replace trigger insert_data1
+  2  After update on emp1
+  3  for each row
+  4  begin
+  5  update emp1@db1todb3 set
+  6  enumber=:new.enumber,
+  7  ename=:new.ename,
+  8  addr=:new.addr,
+  9  email=:new.email,
+ 10  salary=:new.salary
+ 11  where enumber=old.enumber;
+ 12  end;
+ 13  /
+
+Warning: Trigger created with compilation errors.
+
+SQL> show error
+Errors for TRIGGER INSERT_DATA1:
+
+LINE/COL ERROR
+-------- -----------------------------------------------------------------
+2/1      PL/SQL: SQL Statement ignored
+8/15     PL/SQL: ORA-00904: "OLD"."ENUMBER": invalid identifier
+SQL> create or replace trigger insert_data1
+  2
+  3  After update on emp1
+  4  end;
+  5  /
+end;
+*
+ERROR at line 4:
+ORA-04079: invalid trigger specification
+
+
+SQL> create or replace trigger insert_data1
+  2  After update on emp1
+  3  for each row
+  4  begin
+  5  update emp1@db1todb3 set
+  6  enumber=:new.enumber,
+  7  ename=:new.ename,
+  8  addr=:new.addr,
+  9  email=:new.email,
+ 10  salary=:new.salary
+ 11  where enumber=:old.enumber;
+ 12  end;
+ 13  /
+
+Trigger created.
+
+SQL> insert into emp1 values(1,'Sahil','Goregaon','sahil@gmail.com',20000);
+
+1 row created.
+
+SQL> insert into emp1 values(2,'Rahul','RamMandir','rahul@gmail.com',18000);
+
+1 row created.
+
+SQL> insert into emp1 values(3,'Ankit','Malad','ankit@gmail.com',15000);
+
+1 row created.
+
+SQL> insert into emp1 values(4,'Nilesh','Virar','nilesh@gmail.com',10000);
+
+1 row created.
+
+SQL> insert into emp1 values(5,'Rupesh','Aarey','rupesh@gmail.com',9000);
+
+1 row created.
+
+SQL> select * from emp1;
+
+   ENUMBER ENAME      ADDR            EMAIL                    SALARY
+---------- ---------- --------------- -------------------- ----------
+         1 Sahil      Goregaon        sahil@gmail.com           20000
+         2 Rahul      RamMandir       rahul@gmail.com           18000
+         3 Ankit      Malad           ankit@gmail.com           15000
+         4 Nilesh     Virar           nilesh@gmail.com          10000
+         5 Rupesh     Aarey           rupesh@gmail.com           9000
+
+SQL> conn system/sahil@db3
+Connected.
+SQL> select * from emp1;
+
+no rows selected
+
+SQL> conn system/sahil@db1
+Connected.
+SQL> update emp1 set  enumber = 3, ename='Yogesh', address='malad', email='yogesh@gmail.com', salary=18000 where= enumber = 3;
+update emp1 set  enumber = 3, ename='Yogesh', address='malad', email='yogesh@gmail.com', salary=18000 where= enumber = 3
+                                                                                                           *
+ERROR at line 1:
+ORA-00936: missing expression
+
+
+SQL> update emp1 set ename='Yogesh', address='malad', email='yogesh@gmail.com', salary=18000 where= enumber = 3;
+update emp1 set ename='Yogesh', address='malad', email='yogesh@gmail.com', salary=18000 where= enumber = 3
+                                                                                             *
+ERROR at line 1:
+ORA-00936: missing expression
+
+
+SQL> update emp1 set ename='Yogesh', address='malad', email='yogesh@gmail.com', salary=18000 where enumber = 3;
+update emp1 set ename='Yogesh', address='malad', email='yogesh@gmail.com', salary=18000 where enumber = 3
+                                *
+ERROR at line 1:
+ORA-00904: "ADDRESS": invalid identifier
+
+
+SQL> update emp1 set ename='Yogesh', addr='malad', email='yogesh@gmail.com', salary=18000 where enumber = 3;
+
+1 row updated.
+
+SQL> select * from emp1;
+
+   ENUMBER ENAME      ADDR            EMAIL                    SALARY
+---------- ---------- --------------- -------------------- ----------
+         1 Sahil      Goregaon        sahil@gmail.com           20000
+         2 Rahul      RamMandir       rahul@gmail.com           18000
+         3 Yogesh     malad           yogesh@gmail.com          18000
+         4 Nilesh     Virar           nilesh@gmail.com          10000
+         5 Rupesh     Aarey           rupesh@gmail.com           9000
+
+SQL> conn system/sahil@db3
+Connected.
+SQL> select * from emp1;
+
+no rows selected
+
+SQL> conn system/sahil@db1
+Connected.
+SQL> delete from emp1 where enumber=5;
+
+1 row deleted.
+
+SQL> select * from emp1;
+
+   ENUMBER ENAME      ADDR            EMAIL                    SALARY
+---------- ---------- --------------- -------------------- ----------
+         1 Sahil      Goregaon        sahil@gmail.com           20000
+         2 Rahul      RamMandir       rahul@gmail.com           18000
+         3 Yogesh     malad           yogesh@gmail.com          18000
+         4 Nilesh     Virar           nilesh@gmail.com          10000
+
+SQL> select enumber, ename, eesalary from emp1;
+select enumber, ename, eesalary from emp1
+                       *
+ERROR at line 1:
+ORA-00904: "EESALARY": invalid identifier
+
+
+SQL> select enumber, ename, salary from emp1;
+
+   ENUMBER ENAME          SALARY
+---------- ---------- ----------
+         1 Sahil           20000
+         2 Rahul           18000
+         3 Yogesh          18000
+         4 Nilesh          10000
+
+SQL> select email from emp1 where salary=15000;
+
+no rows selected
+
+SQL> select email from emp1 where salary=18000;
+
+EMAIL
+--------------------
+rahul@gmail.com
+yogesh@gmail.com
+
+SQL> select ename, email from emp1 where enumber=1;
+
+ENAME      EMAIL
+---------- --------------------
+Sahil      sahil@gmail.com
+
+SQL> select ename, addr from emp1 where enumber=1;
+
+ENAME      ADDR
+---------- ---------------
+Sahil      Goregaon
+
+SQL>

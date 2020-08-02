@@ -1,0 +1,84 @@
+
+Connected to:
+Oracle Database 11g Enterprise Edition Release 11.1.0.6.0 - Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+
+SQL> conn system/patkar@db1
+Connected.
+SQL> create table Emp20(Acc_no varchar(10),
+  2  Name varchar2(10),
+  3  RECDate date,
+  4  RETDate date);
+
+Table created.
+
+SQL> insert into Emp20 values(2025,'SAHIL','12-feb-2005','12-oct-2011');
+
+1 row created.
+
+SQL> insert into Emp20 values(2211,'RAHUL','11-march-2006','11-nov-2012');
+
+1 row created.
+
+SQL> insert into Emp20 values(2213,'ABHAY','18-april-2000','18-dec-2019');
+
+1 row created.
+
+SQL> insert into Emp20 values(2212,'RAJU','19-jan-2009','18-nov-2018');
+
+1 row created.
+
+SQL> select * from Emp20;
+
+ACC_NO     NAME       RECDATE   RETDATE
+---------- ---------- --------- ---------
+2025       SAHIL      12-FEB-05 12-OCT-11
+2211       RAHUL      11-MAR-06 11-NOV-12
+2213       ABHAY      18-APR-00 18-DEC-19
+2212       RAJU       19-JAN-09 18-NOV-18
+
+SQL> select * from Emp20 where RETDate='12-oct-2011';
+
+ACC_NO     NAME       RECDATE   RETDATE
+---------- ---------- --------- ---------
+2025       SAHIL      12-FEB-05 12-OCT-11
+
+SQL> create table tbl_shares(C_Name varchar2(10),
+  2  No_shares Number(10),
+  3  Price Number(10),
+  4  TransTime varchar(10) Default to_char(sysdate,'HH:MM'));
+
+Table created.
+
+SQL> insert into tbl_shares(C_Name,No_shares,Price)values('sahil',324,500);
+
+1 row created.
+SQL> insert into tbl_shares(C_Name,No_shares,Price)values('rahul',223,800);
+
+1 row created.
+
+SQL> insert into tbl_shares(C_Name,No_shares,Price)values('abhay',256,680);
+
+1 row created.
+
+SQL> insert into tbl_shares(C_Name,No_shares,Price)values('rupesh',243,750);
+
+1 row created.
+
+SQL> select * from tbl_shares;
+
+C_NAME      NO_SHARES      PRICE TRANSTIME
+---------- ---------- ---------- ----------
+sahil             324        500 12:09
+rahul             223        800 12:09
+abhay             256        680 12:09
+rupesh            243        750 12:09
+
+SQL> select * from tbl_shares where price>500 and TransTime='12:09';
+
+C_NAME      NO_SHARES      PRICE TRANSTIME
+---------- ---------- ---------- ----------
+rahul             223        800 12:09
+abhay             256        680 12:09
+rupesh            243        750 12:09
+

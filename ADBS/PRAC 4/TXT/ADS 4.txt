@@ -1,0 +1,174 @@
+
+SQL*Plus: Release 11.2.0.1.0 Production on Mon Oct 28 15:31:09 2019
+
+Copyright (c) 1982, 2010, Oracle.  All rights reserved.
+
+Enter user-name: system
+Enter password:
+
+Connected to:
+Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+
+
+
+SQL> conn system/sahil@db1
+Connected.
+SQL> Create or replace type AddrType1 as object (PinQuery number (5), Street char(20),   City varchar2(50), state varchar2(40), no number(4) );
+  2  /
+
+Type created.
+
+SQL> create or replace type BranchType as object (address AddrType1, phone1 integer,phone2 integer );
+  2  /
+
+Type created.
+
+SQL> create or replace type BranchTableType as table of BranchType;
+  2  /
+
+Type created.
+
+SQL> create or replace type AuthorType as object (name varchar2 (50), addr AddrType1);
+  2  /
+
+Type created.
+
+SQL> create table Authors of AuthorType;
+
+Table created.
+
+SQL> create or replace type AuthorListType as varray(10) of ref AuthorType ;
+  2  /
+
+Type created.
+
+SQL> create or replace type PublisherType as object(name varchar2(50), addr AddrType1, branches BranchTableType);
+  2  /
+
+Type created.
+
+SQL> create table Publishers of PublisherType NESTED TABLE branches STORE as branchtable;
+
+Table created.
+
+SQL> create table books(title varchar2(50), year date, published_by ref PublisherType, authors  AuthorListType);
+
+Table created.
+
+SQL> insert into Authors values('Sahil', AddrType1(7000,'AT street', 'mumbai', 'maharashtra' ,1007));
+
+1 row created.
+
+SQL> insert into Authors values('Ankit', AddrType1(7007,'VT street','mumbai','maharashtra' ,1006));
+
+1 row created.
+
+SQL> insert into Authors values('Rahul',AddrType1(7003,'PL street','mumbai','maharashtra' ,1003));
+
+1 row created.
+
+SQL> insert into Authors values('Nilesh',AddrType1(7008,'AT street', 'mumbai', 'maharashtra' ,1007));
+
+1 row created.
+
+SQL> insert into Authors values ('Prathmesh',AddrType1 (7006,'Nehrut','mumbai','maharashtra' ,1005));
+
+1 row created.
+
+SQL> insert into Authors values ('Abhay', AddrType1(8002,'TH street','pune', 'maharashtra' ,13));
+
+1 row created.
+
+SQL> insert into Authors values('Rupesh',AddrType1(7008,'TT street', 'Nasik','maharashtra' ,1008));
+
+1 row created.
+
+SQL> insert into Authors values('Hrishikesh',AddrType1(7002,'FL street','pune',  'maharashtra' ,03));
+
+1 row created.
+
+SQL> insert into Publishers values ('Shivaji',  AddrType1 (4002,'PK street',  'mumbai','maharashtra',03),  BranchTableType(BranchType (AddrType1(5002,'PL street', 'mumbai', 'maharashtra', 03), 23406,69896)));
+
+1 row created.
+
+SQL>  insert into Publishers values('McGraw',AddrType1(7007,'LJstreet','mumbai'  ,'maharashtra',07), BranchTableType (BranchType ( AddrType1 (7007,'K street','mumbai', 'maharashtra',1007), 4543545,8676775)));
+
+1 row created.
+
+SQL> insert into Publishers values('Tata',AddrType1(7008,'JW street','mumbai', 'maharashtra',27), BranchTableType (BranchType (AddrType1(1002,'DM street','nasik', 'maharashtra',1007), 456767,7675757)));
+
+1 row created.
+
+SQL> insert into Publishers values ('Manish', AddrType1(7002,'ST street','pune','maharashtra' ,1007), BranchTableType (BranchType (AddrType1(1002,'SG street','pune', 'maharashtra', 1007), 4543545,8676775)));
+
+1 row created.
+
+SQL> insert into Publishers values('Tata', AddrType1(6002,'Gold street','nasik','maharashtra' ,1007), BranchTableType(BranchType(AddrType1(6002,'South street', 'nasik','mha',1007), 4543545,8676775)));
+
+1 row created.
+
+SQL> insert into books select 'IP','28-may-1983', ref (pub), AuthorListType(ref(aut)) from Publishers pub,Authors aut where pub.name='Tata' and aut.name='Hrishikesh';
+
+2 rows created.
+
+SQL> insert into books select 'ADBMS','09-jan-1890',ref(pub), AuthorListType(ref(aut)) from  Publishers pub,Authors aut where pub.name='McGraw' and aut.name='Ankit';
+
+1 row created.
+
+SQL> insert into books select 'c prog','25-may-1983', ref (pub),AuthorListType(ref(aut)) from  Publishers pub,Authors aut where pub.name='Shivaji' and aut.name='Abhay';
+
+1 row created.
+
+
+/////////////////////////////////////////////////QUERIES///////////////////////////////////////////////////////////////
+
+
+
+SQL> select a.name from Authors a, Publishers p where a.addr.pinQuery = p.addr.pinQuery;
+
+NAME
+--------------------------------------------------
+Ankit
+Nilesh
+Rupesh
+Hrishikesh
+
+SQL> Select title from books b where 2 <= (select count(*) from table(b.authors));
+
+no rows selected
+
+SQL> Select p.name from publishers p, table (p.branches)
+  2  group by p.name having count(*)> = all (select count(*)from publishers p, table(p.branches) group by name);
+
+NAME
+--------------------------------------------------
+Tata
+
+SQL> select a.name from authors a where not exists(select b.title from books b,table(select authors from books b1 where b.title=b1.title)where a.name=name);
+select a.name from authors a where not exists(select b.title from books b,table(select authors from books b1 where b.title=b1.title)where a.name=name)
+                                                                                *
+ERROR at line 1:
+ORA-01427: single-row subquery returns more than one row
+
+
+SQL> select a.name from authors a, books b, table (b.authors) v where v.column_value = ref(a)  group by a.name having count(*) > 1;
+
+NAME
+--------------------------------------------------
+Hrishikesh
+
+SQL> select a.name from authors a, books b, table (b.authors) v where v.column_value = ref(a)  group by a;
+select a.name from authors a, books b, table (b.authors) v where v.column_value = ref(a)  group by a
+                                                                                                   *
+ERROR at line 1:
+ORA-00904: "A": invalid identifier
+
+
+SQL> select title from authors a, books b, table (b.authors) v where v.column_value = ref(a) group by title having count(*) > 1;
+
+TITLE
+--------------------------------------------------
+IP
+
+SQL>

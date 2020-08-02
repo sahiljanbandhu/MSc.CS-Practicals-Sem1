@@ -1,0 +1,171 @@
+
+SQL*Plus: Release 11.1.0.6.0 - Production on Fri Sep 20 10:07:44 2019
+
+Copyright (c) 1982, 2007, Oracle.  All rights reserved.
+
+Enter user-name: system
+Enter password:
+
+Connected to:
+Oracle Database 11g Enterprise Edition Release 11.1.0.6.0 - Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+
+SQL> conn system/patkar@db2
+Connected.
+SQL> select * from students;
+
+no rows selected
+
+SQL> create or replace trigger insert_data
+  2  after insert on students
+  3  for each row
+  4  begin
+  5  insert into students@db2todb1 values(:new.rollno,:new.name,:new.address,:new.email,:new.age);
+  6  end;
+  7  /
+
+Trigger created.
+
+SQL> create or replace trigger delete_data
+  2  after delete on students
+  3  for each row
+  4  begin
+  5  delete from students@db2todb1 where rollno=old.rollno;
+  6  end;
+  7  /
+
+Warning: Trigger created with compilation errors.
+
+SQL> show errors
+Errors for TRIGGER DELETE_DATA:
+
+LINE/COL ERROR
+-------- -----------------------------------------------------------------
+2/1      PL/SQL: SQL Statement ignored
+2/44     PL/SQL: ORA-00904: "OLD"."ROLLNO": invalid identifier
+SQL> create or replace trigger delete_data
+  2  after delete on students
+  3  for each row
+  4  begin
+  5  delete from students@db2todb1 where rollno=:old.rollno;
+  6  end;
+  7  /
+
+Trigger created.
+
+SQL> create or replace trigger update_data
+  2  after update on students
+  3  for each row
+  4  begin
+  5  update students@db2todb1 set
+  6  rollno-:new.rollno,
+  7  end;
+  8  /
+
+Warning: Trigger created with compilation errors.
+
+SQL> create or replace trigger update_data
+  2  after update on students
+  3  for each row
+  4  begin
+  5  update students@db2todb1 set
+  6  rollno=:new.rollno,
+  7  name=:new.name,
+  8  address=:new.address,
+  9  email=:new.email,
+ 10  age=:new.age where rollno=:old.rollno;
+ 11  end;
+ 12  /
+
+Trigger created.
+
+SQL> insert into students values(1,'hrishi','jogeshwari','hrishi@gmail.com',20);
+insert into students values(1,'hrishi','jogeshwari','hrishi@gmail.com',20)
+                                                    *
+ERROR at line 1:
+ORA-12899: value too large for column "SYSTEM"."STUDENTS"."EMAIL" (actual: 16,
+maximum: 10)
+
+
+SQL> insert into students values(1,'hrishi','jogeshwari','hrishi.com',20);
+
+1 row created.
+
+SQL> insert into students values(2,'rahul','rammandir','rahul.com',20);
+
+1 row created.
+
+SQL> conn system/patkar@db1
+Connected.
+SQL> select * from students;
+
+    ROLLNO NAME       ADDRESS    EMAIL             AGE
+---------- ---------- ---------- ---------- ----------
+         1 hrishi     jogeshwari hrishi.com         20
+         2 rahul      rammandir  rahul.com          20
+
+SQL> conn system/patkar@db2
+Connected.
+SQL> select * from students;
+
+    ROLLNO NAME       ADDRESS    EMAIL             AGE
+---------- ---------- ---------- ---------- ----------
+         1 hrishi     jogeshwari hrishi.com         20
+         2 rahul      rammandir  rahul.com          20
+
+SQL> update students set name=hanif where rollno=2;
+update students set name=hanif where rollno=2
+                         *
+ERROR at line 1:
+ORA-00904: "HANIF": invalid identifier
+
+
+SQL> update students set name="hanif" where rollno=2;
+update students set name="hanif" where rollno=2
+                         *
+ERROR at line 1:
+ORA-00904: "hanif": invalid identifier
+
+
+SQL> update students set name='hanif' where rollno=2;
+
+1 row updated.
+
+SQL> select * from students;
+
+    ROLLNO NAME       ADDRESS    EMAIL             AGE
+---------- ---------- ---------- ---------- ----------
+         1 hrishi     jogeshwari hrishi.com         20
+         2 hanif      rammandir  rahul.com          20
+
+SQL> conn system/patkar@db1
+Connected.
+SQL> select * from students;
+
+    ROLLNO NAME       ADDRESS    EMAIL             AGE
+---------- ---------- ---------- ---------- ----------
+         1 hrishi     jogeshwari hrishi.com         20
+         2 hanif      rammandir  rahul.com          20
+
+SQL> conn system/patkar@db2
+Connected.
+SQL> delete from students where rollno=2;
+
+1 row deleted.
+
+SQL> select * from students;
+
+    ROLLNO NAME       ADDRESS    EMAIL             AGE
+---------- ---------- ---------- ---------- ----------
+         1 hrishi     jogeshwari hrishi.com         20
+
+SQL> conn system/patkar@db1
+Connected.
+SQL> select * from students;
+
+    ROLLNO NAME       ADDRESS    EMAIL             AGE
+---------- ---------- ---------- ---------- ----------
+         1 hrishi     jogeshwari hrishi.com         20
+
+SQL>
+

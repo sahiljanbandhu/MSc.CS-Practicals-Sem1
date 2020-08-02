@@ -1,0 +1,447 @@
+
+SQL*Plus: Release 11.1.0.6.0 - Production on Tue Oct 22 14:40:08 2019
+
+Copyright (c) 1982, 2007, Oracle.  All rights reserved.
+
+Enter user-name: system
+Enter password:
+
+Connected to:
+Oracle Database 11g Enterprise Edition Release 11.1.0.6.0 - Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+
+SQL> CREATE TABLE employee (Dept_idnumber(5),emp_specification XMLTYPE);
+CREATE TABLE employee (Dept_idnumber(5),emp_specification XMLTYPE)
+                                    *
+ERROR at line 1:
+ORA-00902: invalid datatype
+
+
+SQL> CREATE TABLE employee (Dept_id number(5),emp_specification XMLTYPE);
+
+Table created.
+
+SQL> insert into employee values
+  2  (1,XMLTYPE('<emp>
+  3  <e_id>1</e_id>
+  4  <ename>Sahil</ename>
+  5  <email>sahil@yahoo.com</email>
+  6  <acc_no>101</acc_no>
+  7  <mngr_email>aditi@yahoo.com</mngr_email>
+  8  <doj>22 jan 2011</doj>
+  9  </emp>'));
+
+1 row created.
+
+SQL> insert into employee values
+  2  (2,XMLTYPE('<emp>
+  3  <e_id>2</e_id>
+  4  <ename>Ankit</ename>
+  5  <email>ankit@yahoo.com</email>
+  6  <acc_no>102</acc_no>
+  7  <mngr_email>aditi@yahoo.com</mngr_email>
+  8  <doj>22 feb 2011</doj>
+  9  </emp>'));
+
+1 row created.
+
+SQL> insert into employee values
+  2  (3,XMLTYPE('<emp>
+  3  <e_id>3</e_id>
+  4  <ename>Rahul</ename>
+  5  <email>rahul@yahoo.com</email>
+  6  <acc_no>103</acc_no>
+  7  <mngr_email>aditi@yahoo.com</mngr_email>
+  8  <doj>22 mar 2011</doj>
+  9  </emp>'));
+
+1 row created.
+
+SQL> insert into employee values
+  2  (4,XMLTYPE('<emp>
+  3  <e_id>4</e_id>
+  4  <ename>Nilesh</ename>
+  5  <email>nilesh@yahoo.com</email>
+  6  <acc_no>104</acc_no>
+  7  <mngr_email>aditi@yahoo.com</mngr_email>
+  8  <doj>22 april 2011</doj>
+  9  </emp>'));
+
+1 row created.
+
+SQL> insert into employee values
+  2  (4,XMLTYPE('<emp>
+  3  <e_id>4</e_id>
+  4  <ename>Hrishikesh</ename>
+  5  <email>hrishikesh@yahoo.com</email>
+  6  /
+ERROR:
+ORA-01756: quoted string not properly terminated
+
+
+SQL> insert into employee values
+  2  (5,XMLTYPE('<emp>
+  3  <e_id>5</e_id>
+  4  <ename>Hrishikesh</ename>
+  5  <email>hrishikesh@yahoo.com</email>
+  6  <acc_no>105</acc_no>
+  7  <mngr_email>aditi@yahoo.com</mngr_email>
+  8  <doj>22 may 2011</doj>
+  9  </emp>'));
+
+1 row created.
+
+SQL> insert into employee values
+  2  (6,XMLTYPE('<emp>
+  3  <e_id>6</e_id>
+  4  <ename>Suraj</ename>
+  5  <email>suraj@yahoo.com</email>
+  6  <acc_no>106</acc_no>
+  7  <mngr_email>aditi@yahoo.com</mngr_email>
+  8  <doj>22 june 2011</doj>
+  9  </emp>'));
+
+1 row created.
+
+SQL> insert into employee values
+  2  (7,XMLTYPE('<emp>
+  3  <e_id>7</e_id>
+  4  <ename>Rana</ename>
+  5  <email>rana@yahoo.com</email>
+  6  <acc_no>107</acc_no>
+  7  <mngr_email>aditi@yahoo.com</mngr_email>
+  8  <doj>22 july 2011</doj>
+  9  </emp>'));
+
+1 row created.
+
+SQL> insert into employee values
+  2  (8,XMLTYPE('<emp>
+  3  <e_id>8</e_id>
+  4  <ename>Abhay</ename>
+  5  <email>abhay@yahoo.com</email>
+  6  <mngr_email>aditi@yahoo.com</mngr_email>
+  7  <doj>22 aug 2011</doj>
+  8  <acc_no>108</acc_no>
+  9  </emp>'));
+
+1 row created.
+
+SQL> insert into employee values
+  2  (9,XMLTYPE('<emp>
+  3  <e_id>9</e_id>
+  4  <ename>Manish</ename>
+  5  <email>manish@yahoo.com</email>
+  6  <acc_no>109</acc_no>
+  7  <mngr_email>aditi@yahoo.com</mngr_email>
+  8  <doj>22 sept 2011</doj>
+  9  </emp>'));
+
+1 row created.
+
+SQL> insert into employee values
+  2  (10,XMLTYPE('<emp>
+  3  <e_id>10</e_id>
+  4  <ename>Shivaji</ename>
+  5  <email>shivaji@yahoo.com</email>
+  6  <acc_no>110</acc_no>
+  7  <mngr_email>aditi@yahoo.com</mngr_email>
+  8  <doj>22 oct 2011</doj>
+  9  </emp>'));
+
+1 row created.
+
+
+SQL> Select e.emp_specification.EXTRACT('/emp/ename/text()').getStringVal() from
+ employee e;
+
+E.EMP_SPECIFICATION.EXTRACT('/EMP/ENAME/TEXT()').GETSTRINGVAL()
+--------------------------------------------------------------------------------
+
+Sahil
+Ankit
+Rahul
+Nilesh
+Hrishikesh
+Suraj
+Rana
+Abhay
+Manish
+Shivaji
+
+10 rows selected.
+
+SQL> Select e.emp_specification.EXTRACT('/emp/acc_no/text()').getStringVal() fro
+m employee e;
+
+E.EMP_SPECIFICATION.EXTRACT('/EMP/ACC_NO/TEXT()').GETSTRINGVAL()
+--------------------------------------------------------------------------------
+
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+
+10 rows selected.
+
+
+SQL> Select e.emp_specification.EXTRACT('/emp/ename/text()').getStringVal() "Nam
+e", e.emp_specification.EXTRACT('/emp/acc_no/text()').getStringVal() "Account_no
+", e.emp_specification.EXTRACT('/emp/email/text()').getStringVal()  "Email"  fro
+m employee e;
+
+Name
+--------------------------------------------------------------------------------
+
+Account_no
+--------------------------------------------------------------------------------
+
+Email
+--------------------------------------------------------------------------------
+
+Sahil
+101
+sahil@yahoo.com
+
+Ankit
+102
+ankit@yahoo.com
+
+Name
+--------------------------------------------------------------------------------
+
+Account_no
+--------------------------------------------------------------------------------
+
+Email
+--------------------------------------------------------------------------------
+
+
+Rahul
+103
+rahul@yahoo.com
+
+Nilesh
+104
+
+Name
+--------------------------------------------------------------------------------
+
+Account_no
+--------------------------------------------------------------------------------
+
+Email
+--------------------------------------------------------------------------------
+
+nilesh@yahoo.com
+
+Hrishikesh
+105
+hrishikesh@yahoo.com
+
+Suraj
+
+Name
+--------------------------------------------------------------------------------
+
+Account_no
+--------------------------------------------------------------------------------
+
+Email
+--------------------------------------------------------------------------------
+
+106
+suraj@yahoo.com
+
+Rana
+107
+rana@yahoo.com
+
+
+Name
+--------------------------------------------------------------------------------
+
+Account_no
+--------------------------------------------------------------------------------
+
+Email
+--------------------------------------------------------------------------------
+
+Abhay
+108
+abhay@yahoo.com
+
+Manish
+109
+manish@yahoo.com
+
+Name
+--------------------------------------------------------------------------------
+
+Account_no
+--------------------------------------------------------------------------------
+
+Email
+--------------------------------------------------------------------------------
+
+
+Shivaji
+110
+shivaji@yahoo.com
+
+
+10 rows selected.
+
+SQL>
+
+SQL> Update employee e set
+  2  e.emp_specification=XMLTYPE('<emp>
+  3  <ename>Manav</ename>
+  4  <email>nilesh@yahoo.com</email>
+  5  <acc_no>104</acc_no>
+  6  <mngr_email>aditi@yahoo.com</mngr_email>
+  7  <doj>22 april 2011</doj>
+  8  </emp>')
+  9  where e.emp_specification.EXTRACT('/emp/ename/text()').getStringVal()='Nile
+sh';
+
+1 row updated.
+
+SQL> Select e.emp_specification.EXTRACT('/emp/ename/text()').getStringVal() "Nam
+e"
+  2  from employee e
+  3  where e.emp_specification.EXTRACT('/emp/ename/text()').getStringVal()='Mana
+v';
+
+Name
+--------------------------------------------------------------------------------
+
+Manav
+
+SQL> delete from employee e
+  2  where e.emp_specification.EXTRACT('/emp/ename/text()').getStringVal()='Shiv
+aji';
+
+1 row deleted.
+
+
+SQL> select * from employee;
+
+   DEPT_ID
+----------
+EMP_SPECIFICATION
+--------------------------------------------------------------------------------
+
+         1
+<emp>
+<e_id>1</e_id>
+<ename>Sahil</ename>
+<email>sahil@yahoo.com</email>
+<acc_no
+
+         2
+<emp>
+
+   DEPT_ID
+----------
+EMP_SPECIFICATION
+--------------------------------------------------------------------------------
+
+<e_id>2</e_id>
+<ename>Ankit</ename>
+<email>ankit@yahoo.com</email>
+<acc_no
+
+         3
+<emp>
+<e_id>3</e_id>
+<ename>Rahul</ename>
+
+   DEPT_ID
+----------
+EMP_SPECIFICATION
+--------------------------------------------------------------------------------
+
+<email>rahul@yahoo.com</email>
+<acc_no
+
+         4
+<emp>
+<ename>Manav</ename>
+<email>nilesh@yahoo.com</email>
+<acc_no>104</acc_no>
+
+
+   DEPT_ID
+----------
+EMP_SPECIFICATION
+--------------------------------------------------------------------------------
+
+         5
+<emp>
+<e_id>5</e_id>
+<ename>Hrishikesh</ename>
+<email>hrishikesh@yahoo.com</emai
+
+         6
+<emp>
+<e_id>6</e_id>
+
+   DEPT_ID
+----------
+EMP_SPECIFICATION
+--------------------------------------------------------------------------------
+
+<ename>Suraj</ename>
+<email>suraj@yahoo.com</email>
+<acc_no
+
+         7
+<emp>
+<e_id>7</e_id>
+<ename>Rana</ename>
+<email>rana@yahoo.com</email>
+
+   DEPT_ID
+----------
+EMP_SPECIFICATION
+--------------------------------------------------------------------------------
+
+<acc_no>1
+
+         8
+<emp>
+<e_id>8</e_id>
+<ename>Abhay</ename>
+<email>abhay@yahoo.com</email>
+<mngr_e
+
+
+   DEPT_ID
+----------
+EMP_SPECIFICATION
+--------------------------------------------------------------------------------
+
+         9
+<emp>
+<e_id>9</e_id>
+<ename>Manish</ename>
+<email>manish@yahoo.com</email>
+<acc_
+
+
+9 rows selected.
+
+SQL>
+
+
+
+
+
+

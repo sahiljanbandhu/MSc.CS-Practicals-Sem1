@@ -1,0 +1,180 @@
+
+SQL*Plus: Release 11.1.0.6.0 - Production on Tue Oct 22 15:33:01 2019
+
+Copyright (c) 1982, 2007, Oracle.  All rights reserved.
+
+Enter user-name: system
+Enter password:
+
+Connected to:
+Oracle Database 11g Enterprise Edition Release 11.1.0.6.0 - Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+
+SQL> create table cola_mrp (mkt_id number primary key,name varchar(20), shape MD
+SYS.SDO_Geometry);
+
+Table created.
+
+SQL> insert into cola_mrp values (1,'cola_a',MDSYS.SDO_GEOMETRY(2003,NULL,NULL,
+  2  MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3), MDSYS.SDO_ORDINATE_ARRAY(1,1,5,7)))
+  3  /
+
+1 row created.
+
+SQL> insert into cola_mrpvalues(2,'cola_b',MDSYS.SDO_GEOMETRY(2003,NULL,NULL,
+  2  MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,1),
+  3  MDSYS.SDO_ORDINATE_ARRAY(5,1,8,1,8,6,5,7,5,1)))
+  4  /
+insert into cola_mrpvalues(2,'cola_b',MDSYS.SDO_GEOMETRY(2003,NULL,NULL,
+                           *
+ERROR at line 1:
+ORA-00928: missing SELECT keyword
+
+
+SQL> insert into cola_mrp values(2,'cola_b',MDSYS.SDO_GEOMETRY(2003,NULL,NULL,
+  2  MDSYS.SDO_ORDINATE_ARRAY(5,1,8,1,8,6,5,7,5,1)))
+  3  /
+insert into cola_mrp values(2,'cola_b',MDSYS.SDO_GEOMETRY(2003,NULL,NULL,
+                                       *
+ERROR at line 1:
+ORA-06553: PLS-306: wrong number or types of arguments in call to
+'SDO_GEOMETRY'
+
+
+SQL> insert into cola_mrp values(2,'cola_b',MDSYS.SDO_GEOMETRY(2003,NULL,NULL,
+  2  MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,1),
+  3  MDSYS.SDO_ORDINATE_ARRAY(5,1,8,1,8,6,5,7,5,1)))
+  4  /
+
+1 row created.
+
+SQL> insert into cola_mrp values(3,'cola_c',MDSYS.SDO_GEOMETRY( 2003,NULL,NULL,
+  2  MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,1),
+  3  MDSYS.SDO_ORDINATE_ARRAY(3,3,6,3,6,5,4,5,3,3)))
+  4  /
+
+1 row created.
+
+SQL> insert into cola_mrp values(4,'cola_d',MDSYS.SDO_GEOMETRY(2003,NULL,NULL,
+  2  MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,4),
+  3  MDSYS.SDO_ORDINATE_ARRAY(7,9,10,9,8,11)))
+  4  /
+
+1 row created.
+
+SQL> insert into user_SDO_GEOM_METADATAvalues('cola_mrp','shape',
+  2  MDSYS.SDO_DIM_ARRAY(
+  3  MDSYS.SDO_DIM_ELEMENT('X',0,20,0.005),
+  4  MDSYS.SDO_DIM_ELEMENT('Y',0,20,0.005)),NULL);
+insert into user_SDO_GEOM_METADATAvalues('cola_mrp','shape',
+                                         *
+ERROR at line 1:
+ORA-00928: missing SELECT keyword
+
+
+SQL> insert into user_SDO_GEOM_METADATA values('cola_mrp','shape',
+  2  MDSYS.SDO_DIM_ARRAY(
+  3  MDSYS.SDO_DIM_ELEMENT('X',0,20,0.005),
+  4  MDSYS.SDO_DIM_ELEMENT('Y',0,20,0.005)),NULL);
+
+1 row created.
+
+SQL> create index cola_spatial_idx on cola_market(location) Indextype Is mdsys.s
+patial_index;
+create index cola_spatial_idx on cola_market(location) Indextype Is mdsys.spatia
+l_index
+                                 *
+ERROR at line 1:
+ORA-00942: table or view does not exist
+
+
+SQL> create index cola_spatial_idx on cola_mrp(location) Indextype Is mdsys.spat
+ial_index;
+create index cola_spatial_idx on cola_mrp(location) Indextype Is mdsys.spatial_i
+ndex
+                                          *
+ERROR at line 1:
+ORA-00904: "LOCATION": invalid identifier
+
+
+SQL> create index cola_spatial_idx on cola_mrp(location) Index type Is mdsys.spa
+tial_index;
+create index cola_spatial_idx on cola_mrp(location) Index type Is mdsys.spatial_
+index
+                                                          *
+ERROR at line 1:
+ORA-00922: missing or invalid option
+
+
+SQL> create index cola_spatial_idx on cola_mrp(location) Indextype Is mdsys.spat
+ial_index;
+create index cola_spatial_idx on cola_mrp(location) Indextype Is mdsys.spatial_i
+ndex
+                                          *
+ERROR at line 1:
+ORA-00904: "LOCATION": invalid identifier
+
+
+SQL> select SDO_GEOM.SDO_INTERSECTION (c_a.shape,c_c.shape,0.005)
+  2  from cola_mrpc_a,cola_mrpc_c
+  3  where c_a.name='cola_a' AND c_c.name='cola_c';
+from cola_mrpc_a,cola_mrpc_c
+                 *
+ERROR at line 2:
+ORA-00942: table or view does not exist
+
+
+SQL> select SDO_GEOM.SDO_INTERSECTION (c_a.shape,c_c.shape,0.005)
+  2  from cola_mrp c_a,cola_mrp c_c
+  3  where c_a.name='cola_a' AND c_c.name='cola_c';
+
+SDO_GEOM.SDO_INTERSECTION(C_A.SHAPE,C_C.SHAPE,0.005)(SDO_GTYPE, SDO_SRID, SDO_PO
+
+--------------------------------------------------------------------------------
+
+SDO_GEOMETRY(2003, NULL, NULL, SDO_ELEM_INFO_ARRAY(1, 1003, 1), SDO_ORDINATE_ARR
+
+AY(4, 5, 3, 3, 5, 3, 5, 5, 4, 5))
+
+
+SQL> SELECT SDO_GEOM.RELATE(c_c.shape, 'EQUAL', c_a.shape,0.005)
+  2  FROM cola_mrp c_c, cola_mrp c_a
+  3  WHERE c_c.name='cola_c' AND c_a.name = 'cola_a';
+
+SDO_GEOM.RELATE(C_C.SHAPE,'EQUAL',C_A.SHAPE,0.005)
+--------------------------------------------------------------------------------
+
+FALSE
+
+SQL> select name,SDO_GEOM.SDO_AREA(shape,0.005) from  cola_mrp;
+
+NAME                 SDO_GEOM.SDO_AREA(SHAPE,0.005)
+-------------------- ------------------------------
+cola_a                                           24
+cola_b                                         16.5
+cola_c                                            5
+cola_d                                   7.85398163
+
+SQL> select c.name,SDO_GEOM.SDO_AREA(c.shape,0.005) from cola_mrp c
+  2  where c.name='cola_a';
+
+NAME                 SDO_GEOM.SDO_AREA(C.SHAPE,0.005)
+-------------------- --------------------------------
+cola_a                                             24
+
+SQL> select SDO_GEOM.SDO_DISTANCE(c_b.shape,c_d.shape,0.005)
+  2  from cola_mrp c_b,cola_mrp c_d
+  3  where c_b.name= 'cola_b' AND c_d.name ='cola_d';
+
+SDO_GEOM.SDO_DISTANCE(C_B.SHAPE,C_D.SHAPE,0.005)
+------------------------------------------------
+                                       1.8973666
+
+SQL>
+
+
+
+
+
+
+

@@ -1,0 +1,286 @@
+
+SQL*Plus: Release 11.1.0.6.0 - Production on Tue Oct 22 14:07:28 2019
+
+Copyright (c) 1982, 2007, Oracle.  All rights reserved.
+
+Enter user-name: system
+Enter password:
+
+Connected to:
+Oracle Database 11g Enterprise Edition Release 11.1.0.6.0 - Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options
+
+
+SQL> create table Project1 (pname varchar2(10), pno number(5) primary key, thrs
+number(5),
+  2  head_no number(5));
+
+Table created.
+
+SQL> create table Employee1 (eno number(5) primary key, ename varchar2(10), hrs
+number(5), super_no number(5),pno number(5));
+
+Table created.
+
+SQL> alter table Employee1 add constraint et_1 foreign key(pno) references Proje
+ct1(pno);
+
+Table altered.
+
+SQL> insert into Project1 values('prj1',001,5,1);
+
+1 row created.
+
+SQL> insert into Project1 values('prj2',002,10,2);
+
+1 row created.
+
+SQL> insert into Project1 values('prj3',003,10,3);
+
+1 row created.
+
+SQL> insert into Project1 values('prj4',004,8,4);
+
+1 row created.
+
+SQL> insert into Project1 values('prj5',005,5,5);
+
+1 row created.
+
+SQL> insert into Project1 values('prj6',006,6,6);
+
+1 row created.
+
+SQL> create or replace trigger empinsert
+  2           after insert on Employee1 for each row
+  3           when (new.pno is not NULL)
+  4           update Project1
+  5           set thrs=thrs+:new.hrs
+  6           where pno=:new.pno
+  7           /
+
+Trigger created.
+
+SQL>
+SQL>
+SQL>
+SQL>
+SQL>
+SQL> insert into Employee1 values(0001,'Ankit',5,2,001);
+
+1 row created.
+
+SQL> insert into Employee1 values(0002,'Sahil',4,3,002);
+
+1 row created.
+
+SQL> insert into Employee1 values(0003,'Rahul',6,4,004);
+
+1 row created.
+
+SQL> insert into Employee1 values(0004,'Prathmesh',6,2,002) ;
+
+1 row created.
+
+SQL> insert into Employee1 values(0005,'Nilesh',5,3,005);
+
+1 row created.
+
+SQL> create or replace trigger emphrs
+  2            after update of hrs on Employee1
+  3            for each row
+  4  when(new.pno is not NULL)
+  5            update Project1
+  6            set thrs=thrs+:new.hrs-:old.hrs
+  7            where pno=:new.pno
+  8            /
+
+Trigger created.
+
+SQL> select * from Employee1;
+
+       ENO ENAME             HRS   SUPER_NO        PNO
+---------- ---------- ---------- ---------- ----------
+         1 Ankit               5          2          1
+         2 Sahil               4          3          2
+         3 Rahul               6          4          4
+         4 Prathmesh           6          2          2
+         5 Nilesh              5          3          5
+
+
+SQL> select * from Project1;
+
+PNAME             PNO       THRS    HEAD_NO
+---------- ---------- ---------- ----------
+prj1                1         10          1
+prj2                2         20          2
+prj3                3         10          3
+prj4                4         14          4
+prj5                5         10          5
+prj6                6          6          6
+
+6 rows selected.
+
+SQL> update Employee1 set hrs=2 where eno=2;
+
+1 row updated.
+
+SQL> select * from Employee1;
+
+       ENO ENAME             HRS   SUPER_NO        PNO
+---------- ---------- ---------- ---------- ----------
+         1 Ankit               5          2          1
+         2 Sahil               2          3          2
+         3 Rahul               6          4          4
+         4 Prathmesh           6          2          2
+         5 Nilesh              5          3          5
+
+SQL> select * from Project1;
+
+PNAME             PNO       THRS    HEAD_NO
+---------- ---------- ---------- ----------
+prj1                1         10          1
+prj2                2         18          2
+prj3                3         10          3
+prj4                4         14          4
+prj5                5         10          5
+prj6                6          6          6
+
+6 rows selected.
+
+SQL> create or replace trigger empproj
+  2            after update on Employee1
+  3            for each row
+  4            update Project1
+  5  set  thrs= thrs - :old.hrs
+  6            where pno=:old.pno ;
+  7            update Project1
+  8  set  thrs=thrs + :new.hrs
+  9            where pno=:new.pno
+ 10            /
+
+Trigger created.
+
+SQL> select * from Employee1;
+
+       ENO ENAME             HRS   SUPER_NO        PNO
+---------- ---------- ---------- ---------- ----------
+         1 Ankit               5          2          1
+         2 Sahil               2          3          2
+         3 Rahul               6          4          4
+         4 Prathmesh           6          2          2
+         5 Nilesh              5          3          5
+
+SQL> select * from Project1;
+
+PNAME             PNO       THRS    HEAD_NO
+---------- ---------- ---------- ----------
+prj1                1         10          1
+prj2                2         18          2
+prj3                3         10          3
+prj4                4         14          4
+prj5                5         10          5
+prj6                6          6          6
+
+6 rows selected.
+
+SQL> Update Employee1  Set pno=2 where eno=3;
+
+1 row updated.
+
+SQL> select * from Employee1;
+
+       ENO ENAME             HRS   SUPER_NO        PNO
+---------- ---------- ---------- ---------- ----------
+         1 Ankit               5          2          1
+         2 Sahil               2          3          2
+         3 Rahul               6          4          2
+         4 Prathmesh           6          2          2
+         5 Nilesh              5          3          5
+
+SQL> select * from Project1;
+
+PNAME             PNO       THRS    HEAD_NO
+---------- ---------- ---------- ----------
+prj1                1         10          1
+prj2                2         24          2
+prj3                3         10          3
+prj4                4          8          4
+prj5                5         10          5
+prj6                6          6          6
+
+6 rows selected.
+
+SQL> create or replace trigger delemp
+  2             after update of pno on Employee1
+  3             for each row
+  4             update Project1
+  5             set thrs=thrs-:old.hrs
+  6             where pno=:old.pno
+  7              /
+
+Trigger created.
+
+SQL> select * from Employee1;
+
+       ENO ENAME             HRS   SUPER_NO        PNO
+---------- ---------- ---------- ---------- ----------
+         1 Ankit               5          2          1
+         2 Sahil               2          3          2
+         3 Rahul               6          4          2
+         4 Prathmesh           6          2          2
+         5 Nilesh              5          3          5
+
+SQL> select * from Project1;
+
+PNAME             PNO       THRS    HEAD_NO
+---------- ---------- ---------- ----------
+prj1                1         10          1
+prj2                2         24          2
+prj3                3         10          3
+prj4                4          8          4
+prj5                5         10          5
+prj6                6          6          6
+
+6 rows selected.
+
+SQL> update Employee1 set pno=NULL where eno=2;
+
+1 row updated.
+
+SQL> select * from Employee1;
+
+       ENO ENAME             HRS   SUPER_NO        PNO
+---------- ---------- ---------- ---------- ----------
+         1 Ankit               5          2          1
+         2 Sahil               2          3
+         3 Rahul               6          4          2
+         4 Prathmesh           6          2          2
+         5 Nilesh              5          3          5
+
+SQL> select * from Project1;
+
+PNAME             PNO       THRS    HEAD_NO
+---------- ---------- ---------- ----------
+prj1                1         10          1
+prj2                2         20          2
+prj3                3         10          3
+prj4                4          8          4
+prj5                5         10          5
+prj6                6          6          6
+
+6 rows selected.
+
+SQL>
+
+
+
+
+
+
+
+
+
+
+
+
