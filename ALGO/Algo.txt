@@ -1,0 +1,475 @@
+package practical1;
+public class Practical1 {
+public static void main(String[]args){
+int[] input={500,4,2,6,23,12,34,0,1};
+insertionSort(input);
+}
+private static void printNumbers(int[] input){
+for(int i=0;i<input.length;i++){
+System.out.print(input[i]+",");
+}
+System.out.println("\n");
+}
+public static void insertionSort(int array[]){
+int n=array.length;
+for(int j=1;j<n;j++){
+int key=array[j];
+int i=j-1;
+while((i>-1)&&(array[i]>key)){
+array[i+1]=array[i];
+i--;
+}
+array[i+1]=key;
+printNumbers(array);
+}
+double time=n*(n-1)/2;
+System.out.println("Running time"+time+"units");
+}}
+
+
+
+
+
+
+
+package mergesort;
+import java.util.Scanner;
+public class MergeSort {
+   public static void sort(int[] a,int low, int high)
+    {
+        int n = high-low;
+        if(n<=1)
+            return;
+        int mid = low + n/2;
+        sort(a,low,mid);
+        sort(a,mid,high);
+        int[] temp=new int[n];
+        int i = low,j=mid;
+        for(int k = 0;k<n;k++)
+        {
+            if(i==mid)
+                temp[k]=a[j++];
+                        else if (j==high)
+                                temp[k]=a[i++];
+                        else if (a[j]<a[i])
+                        temp[k]=a[j++];
+            else
+                            temp [k]=a[i++];
+        }
+        for (int k=0;k<n;k++)
+            a[low+k]=temp[k];
+              }
+       public static void main(String[] args) {
+Scanner scan = new Scanner(System.in);
+System.out.println("Merge sort Test\n");
+int n, i;
+System.out.println("Enter number of integer element:-");
+n = scan.nextInt();
+int arr[] = new int [n];
+System.out.println("\n Enter "+ n +" Interger elements:- ");
+for(i=0;i<n;i++)
+arr[i]= scan.nextInt();
+sort(arr,0,n);
+System.out.println("\n Elements after sorting");
+for(i=0;i<n;i++)
+System.out.print(arr[i]+" ");
+System.out.print("");
+}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+package JavaApplication1;	
+import java.util.*;
+public class JavaApplication1
+{
+    public final static Scanner STDIN_SCANNER = new Scanner(System.in);
+    public static int i,j,k,a,b,u,v,n,ne=1;
+    public static int min,mincost=0;
+    public static int[][]cost=new int[20][20];
+    public static int[] parent=new int[20];
+    public static void main(String[]args)
+    {
+        System.out.println("\n\t implementation of krushkal's algorithm");
+        System.out.println("\n Enter the no. of vertices:");
+        n=STDIN_SCANNER.nextInt();
+        System.out.println("\n Enter the cost adjacency matrix:");
+        for(i=1;i<=n;i++)
+        {
+            for(j=1;j<=n;j++)
+            {
+                cost[i][j]=STDIN_SCANNER.nextInt();
+                if(cost[i][j]==0)
+                {
+                    cost[i][j]=999;
+                }
+            }
+        }
+        System.out.println("the edges of minimum cost spanning tree are");
+        while(ne<n)
+        {
+            min = 999;
+            for(i=1;i<=n;i++)
+            {
+                for(j=1;j<=n;j++)
+                {
+                   if(cost[i][j]<min)
+                   {
+                       min = cost[i][j];
+                       a=u=i;
+                       b=v=j;
+                   }
+                }
+            }
+            if(v!=u)
+            {
+                parent[v]=u;
+                ne++;
+                System.out.println("edge("+a+","+b+")="+ min);
+                mincost+=min;
+            }
+            cost[a][b] = (cost[b][a] = 999);
+        }
+        System.out.println("\n\t minimum cost=" +mincost);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+packagealgo_prac;
+
+importjava.util.*;
+importjava.lang.*;
+import java.io.*;
+
+public class ShortestPathDijkstras {
+staticint V=5;
+intminDistance(intdist[],Boolean sptSet[]){
+int min=Integer.MAX_VALUE,min_index=-1;
+for(int v=0;v<V;v++)
+if(sptSet[v]==false &&dist[v]<=min){
+min=dist[v];
+min_index=v;
+            }
+returnmin_index;
+    }
+voidprintSolution(intdist[],int n){
+System.out.println("Vertex\t\tDistance from Source");
+for(inti=0;i<V;i++)
+System.out.println(i+"\t\t\t"+dist[i]);
+    }
+voiddijkstra(int graph[][],intsrc)
+    {
+intdist[]=new int[V];
+    Boolean sptSet[]=new Boolean[V];
+for(inti=0;i<V;i++){
+dist[i]=Integer.MAX_VALUE;
+sptSet[i]=false;
+    }
+dist[src]=0;
+for(int count=0;count<V-1;count++){
+int u=minDistance(dist,sptSet);
+sptSet[u]=true;
+
+for(int v=0;v<V;v++){
+        if(!sptSet[v]&& graph[u][v]!=0 &&dist[u]!=Integer.MAX_VALUE&&dist[u]+graph[u][v]<dist[v]){
+dist[v]=dist[u]+graph[u][v];
+        }
+    }
+printSolution(dist,V);
+    }}
+public static void main(String[]args)
+{
+    Scanner scan=new Scanner(System.in);
+int vertices;
+int[][] graph;
+System.out.println("####### Dijktras Algorithm #######");
+    V=scan.nextInt();
+graph=new int[V][V];
+System.out.println("Enter the distance of each vertex:");
+for (inti=0;i<V;i++){
+for(int j=0;j<V;j++)
+        {
+graph[i][j]=scan.nextInt();
+        }
+    }
+ShortestPathDijkstras obj1=new ShortestPathDijkstras();
+obj1.dijkstra(graph, 0);
+}}
+
+
+
+
+
+
+
+
+
+
+package extendedeuclid;
+import java.io.*;
+public class Extendedeuclid {
+public static void main(String[] args) throws IOException {
+        int[] ans = new int[3];
+        int x,y,a,b;
+        BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("Enter the first non negative number");
+        a=Integer.parseInt(br.readLine());
+        System.out.println("Enter the first non negative number");
+        b=Integer.parseInt(br.readLine());
+        ans=Extendedeuclid(a,b);
+        System.out.println("GCD of " + a +" and "+ b +"):");
+        System.out.println("\n gcd(" + a +" and "+ b +") = "+ ans[0] +"\n");
+        System.out.println("Extended form : \n");
+        System.out.println(" " + ans[0] + " = (" + ans[1] +") (" + a + ")");
+        System.out.println(" + (" + ans[2] + ") (" + b + ")\n");
+    }
+    public static int[] Extendedeuclid(int a,int b)
+    {
+        int[] ans = new int[3];
+        int q;
+        if(b==0)
+        {
+          ans[0]=a;
+          ans[1]=1;
+          ans[2]=0;
+        }
+        else
+        {
+             q=a/b;
+	ans = Extendedeuclid (b,a % b);
+	int temp =ans[1] - ans[2]*q;
+             ans[1] = ans[2];
+	ans[2] =temp;
+         }
+        return ans;  
+    }
+}
+
+
+
+
+
+
+
+
+
+
+import java.util.*;
+
+abstract class HuffmanTree implements Comparable<HuffmanTree> {
+
+    public final int frequency; // the frequency of this tree
+
+    public HuffmanTree(int freq) {
+        frequency = freq;
+    }
+    // compares on the frequency
+    public int compareTo(HuffmanTree tree) {
+        return frequency - tree.frequency;
+    }
+}
+class HuffmanLeaf extends HuffmanTree {
+
+    public final char value;
+
+    public HuffmanLeaf(int freq, char val) {
+        super(freq);
+        value = val;
+    }
+}
+class HuffmanNode extends HuffmanTree {
+
+    public final HuffmanTree left, right; // subtrees   
+
+    public HuffmanNode(HuffmanTree l, HuffmanTree r) {
+        super(l.frequency + r.frequency);
+        left = l;
+        right = r;
+    }
+}
+public class Huffman {
+    //input is an array of frequencies, indexed by character code
+    public static HuffmanTree buildTree(int[] charFreqs, char[] test2) {
+        PriorityQueue<HuffmanTree> trees = new PriorityQueue<HuffmanTree>();
+        // initially, we have a forest of leaves
+        // one for each non-empty charactr
+        for (int  i = 0; i < charFreqs.length;i++)
+        if (charFreqs[i] > 0) {
+            trees.offer(new HuffmanLeaf(charFreqs[i], test2[i]));
+        }
+        assert trees.size() > 0;
+        // loop until there is only one tree left
+        while (trees.size() > 1) {
+            // two trees with least frequency
+            HuffmanTree a = trees.poll();
+            HuffmanTree b = trees.poll();
+            //put into new node and re-insert into queue
+            trees.offer(new HuffmanNode(a, b));
+        }
+        return trees.poll();
+    }
+    public static void printCodes(HuffmanTree tree, StringBuffer prefix) {
+        assert tree != null;
+        if (tree instanceof HuffmanLeaf) {
+            HuffmanLeaf leaf = (HuffmanLeaf) tree;
+            // print out character, frequenxy and code for this leaf(which is just the prefix)
+            System.out.println(leaf.value + "\t" + leaf.frequency + "\t" + prefix);
+        } else if (tree instanceof HuffmanNode) {
+            HuffmanNode node = (HuffmanNode) tree;
+            //traverse left
+            prefix.append("0");
+            printCodes(node.left, prefix);
+            prefix.deleteCharAt(prefix.length() - 1);
+            //traverse right
+            prefix.append("1");
+            printCodes(node.right, prefix);
+            prefix.deleteCharAt(prefix.length() - 1);
+        }
+    }
+    public static void main(String[] args) {
+        //Symbols:
+        String str = "abcdef";
+        char[] test2 = str.toCharArray();
+        //Frequency(of the symbols above):
+        int[] charFreqs = {45,13,12,16,9,5};
+        //build tree
+        HuffmanTree tree = buildTree(charFreqs, test2);
+        //print out results
+        System.out.println("SYMBOL\tFREQ\tHUFFMAN CODE");
+        printCodes(tree, new StringBuffer());  }}
+
+
+
+
+
+
+
+
+
+
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
+ 
+/** Class  LongestCommonSubsequence **/
+public class  lcs
+{    
+
+    int count=0;
+    
+    public String lcs(String str1, String str2)
+    {
+        int l1 = str1.length();
+        int l2 = str2.length();
+ 
+        int[][] arr = new int[l1 + 1][l2 + 1];
+ 
+        for (int i = l1 - 1; i >= 0; i--)
+        {
+            for (int j = l2 - 1; j >= 0; j--)
+            {
+                if (str1.charAt(i) == str2.charAt(j))
+                    arr[i][j] = arr[i + 1][j + 1] + 1;
+                else 
+                    arr[i][j] = Math.max(arr[i + 1][j], arr[i][j + 1]);
+            }
+        }
+ 
+        int i = 0, j = 0;
+        StringBuffer sb = new StringBuffer();
+        while (i < l1 && j < l2) 
+        {
+            if (str1.charAt(i) == str2.charAt(j)) 
+            {
+                sb.append(str1.charAt(i));
+                i++;
+                j++;
+                count++;
+            }
+            else if (arr[i + 1][j] >= arr[i][j + 1]) 
+                i++;
+            else
+                j++;
+            
+        }
+        return sb.toString();
+    }
+ 
+    /** Main Function **/
+    public static void main(String[] args) throws IOException
+    {    
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("Longest Common Subsequence Algorithm Test\n");
+ 
+        System.out.println("\nEnter string 1");
+        String str1 = br.readLine();
+ 
+        System.out.println("\nEnter string 2");
+        String str2 = br.readLine();
+ 
+        lcs obj = new lcs(); 
+        String result = obj.lcs(str1, str2);
+ 
+        System.out.println("\nLongest Common Subsequence : "+ result);
+        System.out.println("\nLength of Longest Common Subsequence : "+ obj.count);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+def set_cover(universe, subsets):
+    """Find a family of subsets that covers the universal set"""
+    elements =set(e for s in subsets for e in s)
+    # Check the subsets cover the universe
+    if elements !=universe:
+        return None
+    covered =set()
+    cover =[]
+    # Greedily add the subsets with the most uncovered points
+    while covered !=elements:
+        subset =max(subsets, key=lambda s: len(s -covered))
+        cover.append(subset)
+        covered |=subset
+    return cover
+def main():
+    universe =set(range(1, 11))
+    subsets =[set([1, 2, 3, 8, 9, 10]),
+        set([1, 2, 3, 4, 5]), set([4, 5, 7]), set([5, 6, 7]), set([6, 7, 8, 9, 10])]
+    cover =set_cover(universe, subsets)
+    print(cover)
+if __name__ =='__main__':
+    main()
